@@ -1,0 +1,390 @@
+package rules.labelling;
+
+import org.drools.tx.model.*;
+import org.drools.tx.core.api.*;
+declare Transaction
+    @role(event)
+end
+
+global NotificationService notification;
+query getUnlabelledTXs( )
+    $tx: Transaction( labels.size == 0 ) 
+       
+end
+
+query getUnlocatedTXs()
+    $tx: Transaction( $rId: retailerId, labels.size > 0 )
+    not(Location( id == $rId ))
+end
+
+rule "Coke Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches "(?i).*coca cola.*" || itemDescription matches "(?i).*pepsi.*" 
+                    || itemDescription matches "(?i).*coke.*"  ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Juice Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches "(?i).*juice.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Lemonade Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches "(?i).*lemonade.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+
+rule "Beer Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*beer.*" || itemDescription matches  "(?i).*stella.*" 
+                    || itemDescription matches  "(?i).*pint.*" || itemDescription matches  "(?i).*fosters.*"
+                    || itemDescription matches  "(?i).*budweiser.*" || itemDescription matches  "(?i).*peroni.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("beer"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Whiskey Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*daniels.*" || itemDescription matches  "(?i).*whiskey.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("whiskey"),
+            addLabel("spirit"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Mixed Spirits Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*sambuca.*" || itemDescription matches  "(?i).*bombs.*" 
+                || itemDescription matches  "(?i).*rum.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("mixed"),
+            addLabel("spirit"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Cider Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*cider.*" || itemDescription matches  "(?i).*strongbow.*") 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("cider"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Vodka Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*vodka.*" || itemDescription matches  "(?i).*smirnoff.*"  ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("vodka"),
+            addLabel("spirit"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Tequila Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*tequila.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("spirit"),
+            addLabel("tequila"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "VK Cocktails Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  ".*VK.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("cocktail"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+
+rule "Jaggermeister Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*j-bomb.*" || itemDescription matches  "(?i).*jagger.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("alcohol"),
+            addLabel("cocktail"),
+            addLabel("energy drink"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Energy Drinks Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*monster.*" || itemDescription matches  "(?i).*redbull.*"  || itemDescription matches  "(?i).*red bull.*") 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("energy drink"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+
+rule "Water Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*water.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("water"),
+            addLabel("cold drink")
+        };
+        modify($tx){};
+end
+
+rule "Coffee Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*coffee.*" ||  itemDescription matches  "(?i).*americano.*" 
+                        || itemDescription matches  "(?i).*latte.*" || itemDescription matches  "(?i).*espresso.*" 
+                        || itemDescription matches  "(?i).*cappucino.*" || itemDescription matches  "(?i).*cappuccino.*" 
+                        || itemDescription matches  "(?i).*mocha.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("coffee"),
+            addLabel("hot drink")
+        };
+        modify($tx){};
+end
+
+rule "Tea Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*tea.*" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        modify($l){
+            addLabel("tea"),
+            addLabel("hot drink")
+        };
+        modify($tx){};
+end
+
+rule "Sandwich Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*sandwich.*" )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("sandwich")
+        };
+        modify($tx){};
+end
+
+rule "Burger Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*burger.*" ||  itemDescription matches  "(?i).*quarter pounder.*"  )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("burger")
+        };
+        modify($tx){};
+end
+
+rule "Snack Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*snack.*" ||  itemDescription matches  "(?i).*chips.*")
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("snack")
+        };
+        modify($tx){};
+end
+
+rule "PIZZA Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*pizza.*" )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("pizza")
+        };
+        modify($tx){};
+end
+
+rule "Breakfast Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*egg.*" || itemDescription matches  "(?i).*breakfast.*" 
+                || itemDescription matches  "(?i).*porridge.*" || itemDescription matches  "(?i).*bacon bap.*" || itemDescription matches  "(?i).*muffin.*" 
+                || itemDescription matches  "(?i).*yoghurt.*" || itemDescription matches  "(?i).*granola.*"  )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("breakfast")
+        };
+        modify($tx){};
+end
+
+rule "pastry Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*danish.*" || itemDescription matches  "(?i).*croissant.*" 
+                    || itemDescription matches  "(?i).*pastry.*" || itemDescription matches  "(?i).*cooki.*"  
+                    || itemDescription matches  "(?i).*cake.*"  || itemDescription matches  "(?i).*pain au.*" )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("breakfast"),
+            addLabel("pastry")
+        };
+        modify($tx){};
+end
+
+
+rule "Mixed Food Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*sausage.*" || itemDescription matches  "(?i).*toastie.*"  )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food")
+        };
+        modify($tx){};
+end
+
+rule "Salad  Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*salad.*"  )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("food"),
+            addLabel("salad"),
+            addLabel("cold food")
+        };
+        modify($tx){};
+end
+
+rule "YOYO Accept Tx"
+    no-loop true
+    lock-on-active true
+    when
+        $l: Line( $desc: itemDescription matches  "(?i).*yoyo accept.*"  )
+        $tx: Transaction( lines contains $l ) 
+    then
+        modify($l){
+            addLabel("yoyo-accept")
+        };
+        modify($tx){};
+end
+
+
+rule "TX Labelled & Location Complete"
+    salience -1000
+    when
+        $tx: Transaction( $rId: retailerId, labels.size > 0 )
+        $loc: Location( id == $rId )
+    then
+        notification.notify("{ \"labels\": " + $tx.getFormatedLabels() + ", \"lat\": " + $loc.getLat() + ", \"lon\": " + $loc.getLon() + "}" );
+end 
+   

@@ -1,0 +1,5 @@
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <kbase name="labelKbase" packages="rules.label" default="false"> </kbase>
+    <kbase name="clasifyKbase" includes="labelKbase" packages="rules.classify" eventProcessingMode="stream" default="false"> </kbase>
+    <kbase name="accumulateKbase" includes="clasifyKbase" packages="rules.accumulation" eventProcessingMode="stream" default="false"> </kbase>
+</kmodule>

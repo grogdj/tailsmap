@@ -1,0 +1,20 @@
+package rules.accumulation;
+
+import org.drools.tx.model.*;
+import java.util.List;
+
+rule "Total TXs Accumulation"
+    when
+        $total: Double() from accumulate($tx: Transaction( ), sum($tx.getBasketTotal()))
+    then
+       System.out.println(">> Current Total: " +  $total);
+end
+
+
+rule "Total Per Retailer TXs Accumulation"
+    when
+        $loc: Location( $rId: id )
+        $total: Double() from accumulate($tx: Transaction( retailerId == $rId ) , sum($tx.getBasketTotal()))
+    then
+       System.out.println(">> Current Total Per Retailer: ("+$loc.getName()+") " +  $total);
+end

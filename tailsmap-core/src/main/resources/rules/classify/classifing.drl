@@ -1,0 +1,78 @@
+package rules.classifing;
+
+import org.drools.tx.model.*;
+import java.util.List;
+
+/*
+declare Transaction
+    @role( event )
+    @timestamp( txDate )
+    @expires( 2h )
+end
+*/
+
+declare HotRetailer
+    name : String @key
+    amount : int @key
+end
+
+rule "Sharing Hot Drinks Tx"
+    
+    when
+        $l: Line( quantity > 1, labels contains "hot drink" ) 
+        $tx: Transaction( lines contains $l )
+    then
+       System.out.println(">> Someone is buying hot drinks to share! " + $tx);
+end
+
+rule "Sharing Cold Drinks Tx"
+    
+    when
+        $l: Line( quantity > 1, labels contains "cold drink" ) 
+        $l2: Line( this != $l, quantity > 1, labels contains "cold drink" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        System.out.println(">> Someone is buying cold drinks to share! " + $tx);
+end
+
+rule "Sharing Alcohol Drinks Tx"
+   
+    when
+        $l: Line( quantity > 1, labels contains "alcohol" ) 
+        $tx: Transaction( lines contains $l )
+    then
+        System.out.println(">> Someone is buying alcohol to share! " + $tx);
+end
+
+rule "Mutiple Labelled Tx from the same retailer"
+    no-loop true
+    lock-on-active true
+    when
+        $tx: Transaction( labels.size > 0, $rId: retailerId  )
+        $l: List( size > 100 ) from collect ( Transaction( this != $tx, labels.size > 0 ,  retailerId == $rId ) ) 
+       // not( HotRetailer( name == $rId) )                                          
+    then
+        System.out.println(">> The retailer is on fire " + $tx.getRetailerId() + "- TX size: " +  $l.size());
+        //insert(new HotRetailer($rId, 100));
+end
+
+/*
+rule "Mutiple Labelled Tx from the same retailer increment"
+    no-loop true
+    lock-on-active true
+    when
+        $tx: Transaction( labels.size > 0, $rId: retailerId  )
+        $l: List( size > 100 ) from collect ( Transaction( this != $tx, labels.size > 0 ,  retailerId == $rId ) ) 
+        $hr: HotRetailer( name == $rId )                                          
+    then
+        System.out.println(">> The retailer is on fire " + $tx.getRetailerId() + "- TX size: " +  $hr.getAmount());
+        modify($hr){
+            setAmount($hr.getAmount() + 1)
+        };
+        
+
+end
+*/
+
+
+

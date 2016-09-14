@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Simple markers</title>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #map {
+                height: 80%;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="map"></div>
+
+
+        <script>
+
+            var map;
+            var myLatLng = {lat: 55.3781, lng: 3.4360}; //uk
+            var icons = [];
+
+
+            function initMap() {
+
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 6,
+                    center: myLatLng,
+                    styles: [
+                        {
+                            featureType: 'all',
+                            stylers: [
+                                {saturation: -80}
+                            ]
+                        }, {
+                            featureType: 'road.arterial',
+                            elementType: 'geometry',
+                            stylers: [
+                                {hue: '#00ffee'},
+                                {saturation: 50}
+                            ]
+                        }, {
+                            featureType: 'poi.business',
+                            elementType: 'labels',
+                            stylers: [
+                                {visibility: 'off'}
+                            ]
+                        }
+                    ]
+                });
+                var coffeeIcon = {
+                    name: 'coffee',
+                    url: 'coffee.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(coffeeIcon);
+                var beerIcon = {
+                    name: 'beer',
+                    url: 'pint.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(beerIcon);
+                var pastriesIcon = {
+                    name: 'pastries',
+                    url: 'cookies.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(pastriesIcon);
+                var coldDrinkIcon = {
+                    name: 'cold drink',
+                    url: 'iced-coffee.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(coldDrinkIcon);
+                var cocktailIcon = {
+                    name: 'spirit',
+                    url: 'cocktail.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(cocktailIcon);
+                var stampIcon = {
+                    name: 'yoyo-accept',
+                    url: 'stamp.svg',
+                    //state your size parameters in terms of pixels
+                    size: new google.maps.Size(70, 60),
+                    scaledSize: new google.maps.Size(70, 60),
+                    origin: new google.maps.Point(0, 0)
+                }
+                icons.push(stampIcon);
+
+
+            }
+
+            var wsocket;
+            function connect() {
+                wsocket = new WebSocket("ws://localhost:8080/txs");
+                console.log(wsocket);
+                wsocket.onmessage = onMessage;
+            }  
+
+            function onMessage(evt) {
+                
+                var tx = JSON.parse(evt.data);
+                
+                var marker = new google.maps.Marker({
+                    position: {lat: tx.lat, lng: tx.lon},
+                    map: map,
+                    icon: selectIcons(tx.labels),
+                    title: JSON.stringify(tx.labels),
+                    animation: google.maps.Animation.DROP,
+                    optimized: false
+                });
+                setTimeout(function () {
+                    marker.setMap(null);
+                    delete marker;
+                }, 4000);
+
+            }
+            function selectIcons(labels) {
+                var selectedIcon = icons[0];
+                for (var i = 0; i < labels.length; i++) {
+                    for (var j = 0; j < icons.length; j++) {
+                        if (labels[i] === icons[j].name) {
+                            selectedIcon = icons[j];
+                        }
+                    }
+                }
+                return selectedIcon;
+            }
+            window.addEventListener("load", connect, false);
+        </script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBepPyroA5LIrnRc1KEw-dhS8sMVkVN73o&callback=initMap">
+        </script>
+    </body>
+</html>
